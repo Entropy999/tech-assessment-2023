@@ -1,0 +1,6 @@
+.vscode
+.DS_Store
+*.dump
+node_modules
+server/server/server_venv/
+__pycache__/
