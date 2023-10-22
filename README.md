@@ -1,5 +1,12 @@
 # Take-home Assignment (Full Stack) #
 
+### Demo: ###
+* Two demo videos can be found in [videos_demo](videos_demo) directory.
+
+### Running front-end and back-end ###
+* please follow [client/README.md](client/README.md) and [server/README.md](server/README.md).
+
+
 ### Goal: ###
 * Create an Employee Table like the one in the image below.
 * Use any front-end framework (Angular, React, Vue, ect...) or CSS library to accomplish this.
