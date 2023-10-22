@@ -6,7 +6,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 from datetime import datetime
+from fastapi.middleware import Middleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 import configparser
+from fastapi.middleware.cors import CORSMiddleware
+
 from db_model import employee
 
 # Create a ConfigParser instance and read the configuration file
@@ -27,8 +32,24 @@ Base = declarative_base()
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+class ReferrerPolicyMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
+
 # Create a FastAPI app
 app = FastAPI()
+
+# Configure CORS
+origins = ["*"]  # For development, you can allow all origins using "*"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Create SQLAlchemy ORM model
 Base = declarative_base()
