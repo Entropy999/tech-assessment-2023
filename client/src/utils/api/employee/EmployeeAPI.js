@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+
+// axios.defaults.baseURL = process.env.API_BASE_URL;
+const apiBaseUrl = "http://0.0.0.0:8000"; // Access the API base URL from the .env file
+
+
 class EmployeeAPI {
     static #instance = null;
 
@@ -20,11 +25,11 @@ class EmployeeAPI {
         if (!this.#promise) {
             this.#promise = new Promise((resolve, reject) =>
                 axios
-                    .get(`/employee`)
-                    .then(({ data: { data } }) => resolve(Employee.convertArray(data)))
+                    .get(`${apiBaseUrl}/employee/`)
+                    .then(({ data }) => resolve(Employee.convertArray(data)))
                     .catch((err) => reject(err.response ? err.response.data : err.message))
                     .finally(() => {
-                        this.#promise = null;
+                        this.#promise = null; 
                     })
             );
         }
@@ -34,7 +39,7 @@ class EmployeeAPI {
     static getByid(id) {
         return new Promise((resolve, reject) =>
                 axios
-                    .get(`/employee/${id}`)
+                    .get(`${apiBaseUrl}/employee/${id}`)
                     .then(({ data: {data} }) => resolve(data))
                     .catch((err) => reject(err.response ? err.response.data : err.message))
             );
@@ -44,36 +49,46 @@ class EmployeeAPI {
     static delete(employeeId) {
         return new Promise((resolve, reject) =>
             axios
-                .delete(`/employee/${employeeId}`)
-                .then(({ data: { success } }) => resolve(success))
+                .delete(`${apiBaseUrl}/employee/${employeeId}`)
+                .then(({ data }) => resolve(data))
                 .catch((err) => reject(err.response ? err.response.data : err.message))
         );
     }
 
     static create(fname, lname, salary) {
-        const formdata = new FormData();
-        formdata.append('first_name', fname);
-        formdata.append('last_name', lname);
-        formdata.append('salary', salary);
+        // const formdata = new FormData();
+        // formdata.append('first_name', fname);
+        // formdata.append('last_name', lname);
+        // formdata.append('salary', salary);
+        const formdata = {
+            'first_name': fname,
+            'last_name': lname,
+            'salary': salary
+        };
 
         return new Promise((resolve, reject) =>
             axios
-                .post(`/employee/`, formdata)
-                .then(({ data: {success} }) => resolve(success))
+                .post(`${apiBaseUrl}/employee/`, formdata)
+                .then(({ data }) => resolve(data))
                 .catch((err) => reject(err.response ? err.response.data : err.message))
         );
     }
 
-    static async edit(fname, lname, salary){
-        const formdata = new FormData();
-        formdata.append('first_name', fname);
-        formdata.append('last_name', lname);
-        formdata.append('salary', salary);
+    static async edit(employeeId, fname, lname, salary){
+        // const formdata = new FormData();
+        // formdata.append('first_name', fname);
+        // formdata.append('last_name', lname);
+        // formdata.append('salary', salary);
+        const formdata = {
+            'first_name': fname,
+            'last_name': lname,
+            'salary': salary
+        };
 
         return new Promise((resolve, reject) =>
             axios
-                .put(`/employee`, formdata)
-                .then(({ data: {data} }) => resolve(data))
+                .put(`${apiBaseUrl}/employee/${employeeId}/`, formdata)
+                .then(({ data }) => resolve(data))
                 .catch((err) => reject(err.response ? err.response.data : err.message))
         );
     }
@@ -83,7 +98,7 @@ class EmployeeAPI {
 class Employee {
     #employee = null;
     static convertArray(employees) {
-        return employees.map((employee) => new employee(employee));
+        return employees.map((employee) => new Employee(employee));
     }
 
     constructor(employee) {
@@ -97,6 +112,10 @@ class Employee {
             lastName: this.#employee.last_name,
             salary: this.#employee.salary
         };
+    }
+
+    get id(){
+        return this.#employee.id;
     }
     
     get firstName(){
@@ -146,7 +165,7 @@ class Employee {
     }
 
     edit(){
-        return EmployeeAPI.edit(this.employee.firstName, this.employee.lastName, this.employee.id);
+        return EmployeeAPI.edit(this.employee.id, this.employee.firstName, this.employee.lastName, this.employee.id);
     }
 
     toJSON() {

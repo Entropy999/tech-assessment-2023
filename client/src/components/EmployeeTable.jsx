@@ -12,7 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import EmployeeAPI from '../utils/api/employee/EmployeeAPI';
+import EmployeeAPI, {Employee} from '../utils/api/employee/EmployeeAPI';
 
 import {
   GridRowModes,
@@ -26,9 +26,6 @@ import {
   randomId,
 } from '@mui/x-data-grid-generator';
 
-// const EmployeeCard = lazy(() => import('../../components/Employee/EmployeeCard'));
-// const PageTemplate = lazy(() => import("./PageTemplate"));
-// const AddDependentModal = lazy(() => import('../../components/Employee/modals/AddEmployeeModal'));
 
 const initialEmployees = [
     {
@@ -99,19 +96,22 @@ const initialEmployees = [
   }
 
 function EmployeeTable(){
-  const [rows, setRows] = useState(initialEmployees);
+  const [rows, setRows] = useState([]);
+  const [data, setData] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
 
+    const loadEmployeesTable = () => {
+        EmployeeAPI.getAPI()
+            .get()
+            .then((data) => {
+              setData(data);
+              setRows(data.map((a)=>a.employee));
+            });
+    };
 
-    // const loadEmployeesTable = () => {
-    //     EmployeeAPI.getAPI()
-    //         .get()
-    //         .then((data) => {setRows(data)});
-    // };
-
-    // useEffect(() => {
-    //     loadEmployeesTable();
-    // }, []);
+    useEffect(() => {
+        loadEmployeesTable();
+    }, []);
 
     const handleRowEditStop = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -120,15 +120,24 @@ function EmployeeTable(){
     };
 
     const handleEditClick = (id) => () => {
+      console.log("id=", id);
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
 
     const handleSaveClick = (id) => () => {
+      console.log("handleSaveClick", id);
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
     };
 
     const handleDeleteClick = (id) => () => {
-        setRows(rows.filter((row) => row.id !== id));
+        // setRows(rows.filter((row) => row.id !== id));
+        EmployeeAPI.delete(id)
+        .then((data) => {
+          console.log("delete", data);
+          if (data){
+            loadEmployeesTable();
+          }
+        });
     };
 
     const handleCancelClick = (id) => () => {
@@ -139,14 +148,29 @@ function EmployeeTable(){
 
         const editedRow = rows.find((row) => row.id === id);
         if (editedRow.isNew) {
-        setRows(rows.filter((row) => row.id !== id));
+          setRows(rows.filter((row) => row.id !== id));
         }
     };
 
     const processRowUpdate = (newRow) => {
-        const updatedRow = { ...newRow, isNew: false };
-        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-        return updatedRow;
+      if (newRow.isNew){
+        EmployeeAPI.create(newRow.firstName, newRow.lastName, newRow.salary)
+        .then((data) => {
+          if (data?.id){
+            console.log("success");
+            loadEmployeesTable();
+        }})
+        .catch((error)=>{
+          console.error(error);
+        });
+      }
+      else{
+        EmployeeAPI
+        .edit(newRow.id, newRow.firstName, newRow.lastName, newRow.salary)
+        .then((data) => {
+          console.log("edit", data);
+        });
+      }
     };
 
     const handleRowModesModelChange = (newRowModesModel) => {
@@ -256,6 +280,7 @@ function EmployeeTable(){
                 slotProps={{
                     toolbar: { setRows, setRowModesModel },
                 }}
+                onProcessRowUpdateError={error => {console.log(error)}}
             />
         </Box>);
 };
