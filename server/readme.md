@@ -73,7 +73,8 @@
     `first_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'employee legal first name',
     `last_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'employee legal last name',
     `salary` bigint(20) NOT NULL DEFAULT 0 COMMENT 'employee salary',
-    PRIMARY KEY (`id`)) 
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `unique_employee` (`first_name`, `last_name`)) 
     ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='employee table';
 
    ```

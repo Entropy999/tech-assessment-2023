@@ -46,6 +46,14 @@ def read_by_id(employee_id: int, db: Session):
 
 
 def create(employeeCreate: EmployeeCreate, db: Session):
+    # check if employee already exists
+    existing_employee = db.query(Employee).filter(
+        Employee.first_name == employeeCreate.first_name,
+        Employee.last_name == employeeCreate.last_name
+    ).first()
+    if existing_employee:
+        raise HTTPException(status_code=400, detail="Employee already exist")
+    
     db_employee = Employee(**employeeCreate.dict())
     db.add(db_employee)
     db.commit()
@@ -57,6 +65,16 @@ def update(employee_id: int, updated_employee: EmployeeCreate, db: Session):
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # if changed employee name, we should check if employee already exists
+    if updated_employee.first_name != employee.first_name or updated_employee.last_name != employee.last_name:
+        existing_employee = db.query(Employee).filter(
+            Employee.first_name == updated_employee.first_name,
+            Employee.last_name == updated_employee.last_name
+        ).first()
+        if existing_employee:
+            raise HTTPException(status_code=400, detail="Employee already exist")
+    
     for key, value in updated_employee.dict().items():
         setattr(employee, key, value)
     db.commit()

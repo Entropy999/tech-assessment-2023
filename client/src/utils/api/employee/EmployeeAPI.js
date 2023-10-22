@@ -40,7 +40,7 @@ class EmployeeAPI {
         return new Promise((resolve, reject) =>
                 axios
                     .get(`${apiBaseUrl}/employee/${id}`)
-                    .then(({ data: {data} }) => resolve(data))
+                    .then(({ data }) => resolve(new Employee(data)))
                     .catch((err) => reject(err.response ? err.response.data : err.message))
             );
         }
@@ -50,8 +50,8 @@ class EmployeeAPI {
         return new Promise((resolve, reject) =>
             axios
                 .delete(`${apiBaseUrl}/employee/${employeeId}`)
-                .then(({ data }) => resolve(data))
-                .catch((err) => reject(err.response ? err.response.data : err.message))
+                .then(({ data }) => resolve(new Employee(data)))
+                .catch((err) => {reject(err.response ? err.response.data.detail : err.message)})
         );
     }
 
@@ -65,8 +65,8 @@ class EmployeeAPI {
         return new Promise((resolve, reject) =>
             axios
                 .post(`${apiBaseUrl}/employee/`, formdata)
-                .then(({ data }) => resolve(data))
-                .catch((err) => reject(err.response ? err.response.data : err.message))
+                .then(({ data }) => resolve(new Employee(data)))
+                .catch((err) => {reject(err.response ? err.response.data.detail : err.message)})
         );
     }
 
@@ -80,8 +80,8 @@ class EmployeeAPI {
         return new Promise((resolve, reject) =>
             axios
                 .put(`${apiBaseUrl}/employee/${employeeId}/`, formdata)
-                .then(({ data }) => resolve(data))
-                .catch((err) => reject(err.response ? err.response.data : err.message))
+                .then(({ data }) => resolve(new Employee(data)))
+                .catch((err) => {reject(err.response ? err.response.data.detail : err.message)})
         );
     }
     

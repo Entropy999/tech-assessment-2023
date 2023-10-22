@@ -1,10 +1,5 @@
-// import React, { useEffect, useState, lazy } from 'react';
-// // import Session from '../../utils/api/Session';
-// import Swal from '../../utils/Swal';
-// import * as React from 'react';
-import React, { useEffect, useState, lazy } from 'react';
-// import * as React from 'react';
-
+import Swal from '../utils/Swal';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
@@ -12,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import EmployeeAPI, {Employee} from '../utils/api/employee/EmployeeAPI';
+import EmployeeAPI from '../utils/api/employee/EmployeeAPI';
 
 import {
   GridRowModes,
@@ -66,29 +61,38 @@ function EmployeeTable(){
 
     const handleRowEditStop = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-        event.defaultMuiPrevented = true;
+          event.defaultMuiPrevented = true;
         }
     };
 
     const handleEditClick = (id) => () => {
-      console.log("id=", id);
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+      setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
 
     const handleSaveClick = (id) => () => {
-      console.log("handleSaveClick", id);
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+      setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
     };
 
     const handleDeleteClick = (id) => () => {
         // setRows(rows.filter((row) => row.id !== id));
         EmployeeAPI.delete(id)
         .then((data) => {
-          console.log("delete", data);
-          if (data){
-            loadEmployeesTable();
-          }
-        });
+          loadEmployeesTable();
+          Swal.fire({
+            icon: 'success',
+            title: `The employee ${data.firstName} ${data.lastName} has been deleted.`,
+            showCancelButton: false,
+          })
+        })
+        .catch((error) =>{
+          Swal.fire({
+            icon: 'warning',
+            title: 'Unable to delete this employee',
+            text: error,
+            showCancelButton: false,
+          })
+        }
+        );
     };
 
     const handleCancelClick = (id) => () => {
@@ -107,19 +111,39 @@ function EmployeeTable(){
       if (newRow.isNew){
         EmployeeAPI.create(newRow.firstName, newRow.lastName, newRow.salary)
         .then((data) => {
-          if (data?.id){
-            console.log("success");
             loadEmployeesTable();
-        }})
+            Swal.fire({
+              icon: 'success',
+              title: `The new employee ${data.firstName} ${data.lastName} has been created.`,
+              showCancelButton: false,
+            })})
         .catch((error)=>{
-          console.error(error);
+          Swal.fire({
+            icon: 'warning',
+            title: 'Unable to create this employee',
+            text: error,
+            showCancelButton: false,
+          })
         });
       }
       else{
         EmployeeAPI
         .edit(newRow.id, newRow.firstName, newRow.lastName, newRow.salary)
         .then((data) => {
-          console.log("edit", data);
+          loadEmployeesTable();
+          Swal.fire({
+            icon: 'success',
+            title: `The employee ${data.firstName} ${data.lastName}'s info has been saved.`,
+            showCancelButton: false,
+          })
+        })
+        .catch((error)=>{
+          Swal.fire({
+            icon: 'warning',
+            title: 'Unable to edit this employee',
+            text: error,
+            showCancelButton: false,
+          })
         });
       }
     };
@@ -164,7 +188,6 @@ function EmployeeTable(){
           cellClassName: 'actions',
           getActions: ({ id }) => {
             const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-    
             if (isInEditMode) {
               return [
                 <GridActionsCellItem
@@ -231,7 +254,7 @@ function EmployeeTable(){
                 slotProps={{
                     toolbar: { setRows, setRowModesModel },
                 }}
-                onProcessRowUpdateError={error => {console.log(error)}}
+                onProcessRowUpdateError={()=>{}}
             />
         </Box>);
 };
