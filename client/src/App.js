@@ -14,8 +14,8 @@ export default function App() {
     }}>
       <h1>Employees</h1>
       <div style={{
-        width: '50%',  // Set the desired width for the table
-        height: '800px', // Set the desired height for the table
+        width: 800,  // Set the desired width for the table
+        height: '700px', // Set the desired height for the table
       }}>
         <EmployeeTable />
       </div>

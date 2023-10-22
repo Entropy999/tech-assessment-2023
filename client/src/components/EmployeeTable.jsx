@@ -173,7 +173,7 @@ function EmployeeTable(){
           field: 'salary',
           headerName: 'Salary',
           type: 'number',
-          width: 100,
+          width: 200,
           align: 'right',
           headerAlign: 'right',
           editable: true,
@@ -182,7 +182,7 @@ function EmployeeTable(){
           field: 'actions',
           type: 'actions',
           headerName: 'Actions',
-          width: 300,
+          width: 200,
           align: 'center',
           headerAlign: 'center',
           cellClassName: 'actions',
@@ -255,6 +255,12 @@ function EmployeeTable(){
                     toolbar: { setRows, setRowModesModel },
                 }}
                 onProcessRowUpdateError={()=>{}}
+
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 10, page: 0 },
+                  },
+                }}
             />
         </Box>);
 };
