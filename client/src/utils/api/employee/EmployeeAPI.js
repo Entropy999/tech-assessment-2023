@@ -56,10 +56,6 @@ class EmployeeAPI {
     }
 
     static create(fname, lname, salary) {
-        // const formdata = new FormData();
-        // formdata.append('first_name', fname);
-        // formdata.append('last_name', lname);
-        // formdata.append('salary', salary);
         const formdata = {
             'first_name': fname,
             'last_name': lname,
@@ -75,10 +71,6 @@ class EmployeeAPI {
     }
 
     static async edit(employeeId, fname, lname, salary){
-        // const formdata = new FormData();
-        // formdata.append('first_name', fname);
-        // formdata.append('last_name', lname);
-        // formdata.append('salary', salary);
         const formdata = {
             'first_name': fname,
             'last_name': lname,

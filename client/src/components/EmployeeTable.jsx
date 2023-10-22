@@ -27,53 +27,6 @@ import {
 } from '@mui/x-data-grid-generator';
 
 
-const initialEmployees = [
-    {
-      id: 1,
-      firstName: "Lewis",
-      lastName: "Burson",
-      salary: 40700
-    },
-    {
-      id: 2,
-      firstName: "Ian",
-      lastName: "Malcolm",
-      salary: 70000
-    },
-    {
-      id: 3,
-      firstName: "Ellie",
-      lastName: "Sattler",
-      salary: 102000
-    },
-    {
-      id: 4,
-      firstName: "Dennis",
-      lastName: "Nedry",
-      salary: 52000
-    },
-    {
-      id: 5,
-      firstName: "John",
-      lastName: "Hammond",
-      salary: 89600
-    },
-    {
-      id: 6,
-      firstName: "Ray",
-      lastName: "Arnold",
-      salary: 45000
-    },
-    {
-      id: 7,
-      firstName: "Laura",
-      lastName: "Burnett",
-      salary: 80000
-    }
-  ]
-
-
-
   function EditToolbar(props) {
     const { setRows, setRowModesModel } = props;
   
@@ -97,14 +50,12 @@ const initialEmployees = [
 
 function EmployeeTable(){
   const [rows, setRows] = useState([]);
-  const [data, setData] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
 
     const loadEmployeesTable = () => {
         EmployeeAPI.getAPI()
             .get()
             .then((data) => {
-              setData(data);
               setRows(data.map((a)=>a.employee));
             });
     };
